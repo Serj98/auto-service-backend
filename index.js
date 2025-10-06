@@ -3,12 +3,14 @@ const express = require('express');
 const cors = require('cors');
 require('dotenv').config();
 const carRoutes = require('./routes/carRoutes');
+const visitRoutes = require('./routes/visitRoutes');
 
 const app = express();
 app.use(cors());
 app.use(express.json());
 
 app.use('/cars', carRoutes);
+app.use('/visits', visitRoutes);
 
 app.get('/', async (req, res) => {
     res.send('API functionează!');
