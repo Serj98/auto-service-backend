@@ -33,5 +33,20 @@ router.get('/', async (req, res) => {
     }
 });
 
+// Get /cars/:id/visits - List all visits for a specific car
+// Primeste un id de masina ca parametru si returneaza toate vizitele asociate acelei masini
+router.get('/:id/visits', async (req, res) => {
+    try {
+        const carId = parseInt(req.params.id); // extrage id-ul masinii din URL si il converteste la int
+        const visits = await prisma.visit.findMany({ 
+            where: { carId }, 
+        })
+        res.json(visits); // returneaza vizitele ca raspuns JSON
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Eroare la preluarea visitelor acestei masini'});
+    }
+});
+
 // Exportam routerul
 module.exports = router; // ne permite sa importam rutele in index.js si sa le activam cu app.use('/cars', carRoutes);
