@@ -37,4 +37,23 @@ router.get('/', async (req, res) => {
     }
 });
 
+// Get /visits/:id - Get a specific visit by ID
+
+router.get('/:id', async (req, res) => {
+    try {
+        const id = parseInt(req.params.id);
+        const visit = await prisma.visit.findUnique({ 
+                where: { id },
+                include: { car: true}, // includem datele masinii asociate vizitei 
+            });
+            if (!visit) {
+                res.status(404).json({ error: 'Vizita nu a fost gasita' });
+            }
+            res.json(visit);
+    } catch (error) {
+        console.log(error);
+        req.status(500).json({ error: 'Eroare la preluarea vizitei'});
+    }
+});
+
 module.exports = router;
