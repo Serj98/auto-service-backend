@@ -56,4 +56,22 @@ router.get('/:id', async (req, res) => {
     }
 });
 
+// Delete /visits/:id - Delete a specific visit by ID
+
+router.delete('/:id', async (req, res) => {
+    try {
+        const id = parseInt(req.params.id);
+        await prisma.visit.delete({
+            where: { id },
+        })
+        res.json( {message: `Vizita cu id-ul ${id} a fost stearsa cu succes`});
+    } catch (error) {
+        console.error('Eroare DELETE /visits/:id', error);
+        if( error.code === 'P2025') { // cod de eroare Prisma care indica faptul ca inregistrarea nu a fost gasita
+            return res.status(404).json({ error: 'Vizita nu a fost gasita'});
+        }
+        res.status(500).json({error: 'Eroare la stergerea vizitei'});
+    }
+});
+
 module.exports = router;

@@ -66,5 +66,27 @@ router.get('/:id', async (req, res) => {
 
 });
 
+// Delete /cars/:id - Delete a specific car by ID
+
+router.delete('/:id', async(req, res) => {
+    try {
+        const id = parseInt(req.params.id);
+        await prisma.visit.deleteMany({ // sterge toate vizitele asociate masinii inainte de a sterge masina
+            where: { carId: id}
+        });
+        await prisma.car.delete({ // sterge masina
+            where: { id }
+        });
+        res.json({ message: `Masina cu id ${id} si vizitele asociate au fost sterse cu succes`});
+    } catch (error){
+        console.error('Eroare DELETE /cars/:id', error);
+
+        if (error.code === 'P2025') { // cod de eroare Prisma care indica faptul ca inregistrarea nu a fost gasita
+            return res.status(404).json({ error: 'Masina nu a fost gasita'});
+        }
+        res.status(500).json({ error: 'Eroare la stergerea masinii'});
+    }
+});
+
 // Exportam routerul
 module.exports = router; // ne permite sa importam rutele in index.js si sa le activam cu app.use('/cars', carRoutes);
