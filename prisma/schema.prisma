@@ -28,9 +28,10 @@ model Visit {
   car         Car      @relation(fields: [carId], references: [id])
   carId       Int
   description String
-  date        DateTime @default(now())
-  mileage     Int
-
+  date        DateTime @default(now()) // data ultimei revizii
+  mileage     Int // kilometraj la ultima revizie
+  nextServiceDate DateTime? // data automata (calculata la 1 an de la ultima revizie)
+  customNextServiceDate DateTime? // data setata manual de service 
   createdAt   DateTime @default(now())
 }
 

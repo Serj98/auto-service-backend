@@ -4,18 +4,40 @@ const prisma = require('../prismaClient');
 
 // Post /visits - Create a new visit
 router.post('/', async( req, res) => {
-    const { carId, description, date, mileage} = req.body;
+    const { carId, description,customNextServiceDate, date, mileage} = req.body;
 
 try {
+
+    // Calculate date automatically one year from the visit date
+    const visitDate = date ? new Date(date) : new Date();
+    visitDate.setMilliseconds(0);
+
+    const autoNextDate = new Date(visitDate);
+    autoNextDate.setFullYear(autoNextDate.getFullYear() + 1 );
+
     const visit = await prisma.visit.create({
         data: {
             carId,
             description,
-            date: new Date(date),
+            date: visitDate,
             mileage,
+            customNextServiceDate: customNextServiceDate ? new Date(customNextServiceDate) : null,
+            nextServiceDate: customNextServiceDate ? new Date(customNextServiceDate) : autoNextDate,
         }
     });
-    res.status(201).json(visit);
+
+      const formattedVisit = {
+      ...visit,
+      date: visit.date.toISOString().slice(0, 19).replace('T', ' '),
+      nextServiceDate: visit.nextServiceDate 
+        ? visit.nextServiceDate.toISOString().slice(0, 19).replace('T', ' ')
+        : null, 
+      customNextServiceDate: visit.customNextServiceDate
+        ? visit.customNextServiceDate.toISOString().slice(0, 19).replace('T', ' ')
+        : null,
+    };
+
+    res.status(201).json(formattedVisit);
 } catch (error) {
     console.error(error);
     res.status(500).json({ error: 'Eroare la adaugarea vizitei' });
